@@ -1,3 +1,6 @@
+/RevNRide
+/rnr report
+
 *#
 *.iml
 *.ipr

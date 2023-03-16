@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.revnride.app.config.CustomUserDetailsService;
 import com.revnride.app.config.JwtUtil;
-import com.revnride.app.model.AuthenticationRequest;
-import com.revnride.app.model.AuthenticationResponse;
-import com.revnride.app.model.UserDTO;
+import com.revnride.app.dto.AuthenticationRequestDTO;
+import com.revnride.app.dto.AuthenticationResponseDTO;
+import com.revnride.app.dto.UserDTO;
 
 @RestController
 public class AuthenticationController {
@@ -31,11 +31,11 @@ public class AuthenticationController {
 	private JwtUtil jwtUtil;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequestDTO authenticationRequest)
 			throws Exception {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-					authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+					authenticationRequest.getEmail(), authenticationRequest.getPassword()));
 		} catch (DisabledException e) {
 			throw new Exception("USER_DISABLED", e);
 		}
@@ -43,9 +43,9 @@ public class AuthenticationController {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
 		
-		UserDetails userdetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+		UserDetails userdetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 		String token = jwtUtil.generateToken(userdetails);
-		return ResponseEntity.ok(new AuthenticationResponse(token));
+		return ResponseEntity.ok(new AuthenticationResponseDTO(token));
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)

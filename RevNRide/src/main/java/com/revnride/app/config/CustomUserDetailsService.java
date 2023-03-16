@@ -12,8 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.revnride.app.model.DAOUser;
-import com.revnride.app.model.UserDTO;
+import com.revnride.app.dto.UserDTO;
 import com.revnride.app.repository.UserRepository;
 
 @Service
@@ -27,21 +26,23 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private PasswordEncoder bcryptEncoder;
 	
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		List<SimpleGrantedAuthority> roles = null;
 		
 			
-		DAOUser user = userDao.findByUsername(username);
+		com.revnride.app.entity.User user = userDao.findByEmail(email);
 		if (user != null) {
 			roles = Arrays.asList(new SimpleGrantedAuthority(user.getRole()));
 			return new User(user.getUsername(), user.getPassword(), roles);
 		}
-		throw new UsernameNotFoundException("User not found with the name " + username);	}
+		throw new UsernameNotFoundException("User not found with the email " + email);	}
 	
-	public DAOUser save(UserDTO user) {
-		DAOUser newUser = new DAOUser();
+	public com.revnride.app.entity.User save(UserDTO user) {
+		com.revnride.app.entity.User newUser = new com.revnride.app.entity.User();
 		newUser.setUsername(user.getUsername());
-		newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+		newUser.setEmail(user.getEmail());
+		newUser.setPassword(user.getPassword());
+//		newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
 		newUser.setRole(user.getRole());
 		return userDao.save(newUser);
 	}
